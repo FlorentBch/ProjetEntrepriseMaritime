@@ -1,0 +1,26 @@
+services:
+
+  Schedule:
+    build:
+      context: .
+      dockerfile: DockerFileSchedule
+      ports:
+        - 4789:9874
+      networks:
+        - app-VNet
+  appscrap:
+    build:
+      context: .
+      dockerfile: DockerfileData
+    ports:
+      - ${PORT_DATA}:5000
+    networks:
+      - app-VNet
+    volumes:
+      - ./Data:/app/Data
+    depends_on:
+      - Schedule
+
+networks:
+  app-VNet:
+    driver: bridge

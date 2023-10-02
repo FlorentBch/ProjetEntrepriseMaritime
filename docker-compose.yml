@@ -1,0 +1,30 @@
+services:
+
+  application:
+    build:
+      context: .
+      dockerfile: Appdockerfile
+    ports:
+      - 4789:9874
+    networks:
+      - app-VNet
+    volumes:
+      - ./Data:/app/Data
+  db:
+    build:
+      context: .
+      dockerfile: PGdockerfile
+    networks:
+      - app-VNet
+    volumes:
+      - ./CreateDB_SQL.sql:/docker-entrypoint-initdb.d/create_database.sql
+    depends_on:
+      - application
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+
+networks:
+  app-VNet:
+    driver: bridge

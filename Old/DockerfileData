@@ -1,0 +1,21 @@
+# Utilisez une image de base Python
+FROM python
+
+# Définition du répertoire de travail dans le conteneur
+WORKDIR /app
+
+# Copie des fichiers requis dans le conteneur
+# Le point sert à copier le fichier dans le dossier du WORKDIR
+COPY Requirements.txt .
+COPY Application /app/Application
+COPY .env /app
+
+# Création du dossier pour le fichier CSV et Json
+RUN mkdir -p /app/Data/csv/
+RUN mkdir -p /app/Data/json/
+
+# Installation des dépendances
+RUN pip install -r Requirements.txt
+
+# Commande pour exécuter l'application
+CMD ["python", "Application/main.py"]

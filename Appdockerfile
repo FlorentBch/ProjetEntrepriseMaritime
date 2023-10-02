@@ -1,0 +1,38 @@
+FROM alpine:3.17
+
+# Install required packages
+RUN apk add --update --no-cache bash dos2unix
+
+# Install python/pip
+RUN apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python
+RUN python3 -m ensurepip --upgrade
+ENV PYTHONUNBUFFERED=1
+RUN python -m pip install --upgrade pip
+
+# Définition du répertoire de travail dans le conteneur
+WORKDIR /app
+
+# Copie des fichiers requis dans le conteneur
+# Le point sert à copier le fichier dans le dossier du WORKDIR
+COPY Requirements.txt .
+COPY Application /app/Application
+COPY .env /app
+
+# Création du dossier pour le fichier CSV
+RUN mkdir -p /app/Data
+
+# Installation des dépendances
+RUN pip install -r Requirements.txt
+
+WORKDIR /usr/scheduler
+
+# Copy files
+COPY luncherApp.sh ./jobs/
+COPY crontab.* ./
+COPY start.sh .
+
+# create cron.log file
+RUN touch /var/log/cron.log
+
+# Run cron on container startup
+CMD ["bash","./start.sh"]
